@@ -1,4 +1,4 @@
-function stringFormat(template, args) {
+function formatString(template, args) {
   var i = 0, ii;
   args = Array.prototype.slice.call(arguments, 1);
   ii = args.length;

@@ -5,10 +5,15 @@ function INNamespace(inbox, id) {
     id = data.id;
   }
   this.super(inbox, id, id);
+	this._.namespace = this;
   if (data) this.update(data);
 }
 
 inherits(INNamespace, INModelObject);
+
+INNamespace.prototype.namespace = function() {
+	return this;
+};
 
 INNamespace.prototype.resourcePath = function() {
   if (this.isUnsynced()) {
@@ -102,6 +107,54 @@ INNamespace.prototype.threads = function(optionalThreadsOrFilters, filters) {
   });  
 };
 
+INNamespace.prototype.tags = function(optionalTagsOrFilters, filters) {
+  var self = this;
+  var inbox = this.inbox();
+  var cache = inbox._.cache;
+  var updateTags = null;
+
+  if (optionalTagsOrFilters && typeof optionalTagsOrFilters === 'object') {
+    if (isArray(optionalTagsOrFilters)) {
+      updateTags = optionalTagsOrFilters;
+    } else if (!filters) {
+      filters = optionalTagsOrFilters;
+    }
+  }
+  if (filters && typeof filters !== 'object') {
+    filters = null;
+  }
+
+  return this.promise(function(resolve, reject) {
+    if (filters) {
+      return apiRequest(inbox, 'get', urlFormat('%@/tags%@',
+        self.resourcePath(), applyFilters(filters)), tagsReady);
+    }
+
+    cache.getByType('namespace', function(err, set) {
+      if (err) return reject(err);
+      if (set && set.length) return tagsReady(null, set);
+      apiRequest(inbox, 'get', urlFormat('%@/threads',
+        self.resourcePath()), tagsReady);
+    });
+
+    function tagsReady(err, set) {
+      if (err) return reject(err);
+
+      if (updateTags) {
+        return resolve(mergeArray(updateTags, set, 'id', function(data) {
+          cache.persist(data.id, data, noop);
+          return new INTag(self, data);
+        }));
+      }
+
+      resolve(map(set, function(item) {
+        cache.persist(item.id, item, noop);
+        return new INTag(self, item);
+      }));
+    }
+  });  
+};
+
 INNamespace.prototype.uploadFile = function(fileNameOrFile, blobForFileName) {
 	var self = this;
 	return this.promise(function(resolve, reject) {
@@ -116,3 +169,9 @@ INNamespace.prototype.uploadFile = function(fileNameOrFile, blobForFileName) {
 		});
 	});
 };
+
+function getNamespace(inbox, namespaceId) {
+	// TODO(@caitp): we should use LRU cache or something here, but since there's no way to know when
+	// namespaces are collected, it's probably better to just create a new instance all the time.
+	return new INNamespace(inbox, namespaceId);
+}

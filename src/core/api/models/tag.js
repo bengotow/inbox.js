@@ -1,9 +1,7 @@
 function INTag(inbox, id, namespaceId) {
-  var namespace;
   if (inbox instanceof INNamespace) {
-    namespace = inbox;
-    inbox = namespace.inbox();
-    namespaceId = namespace.id;
+    namespaceId = inbox;
+    inbox = namespaceId.inbox();
   }
   var data = null;
   if (id && typeof id === 'object') {
@@ -34,6 +32,28 @@ INTag.prototype.name = function() {
     return localizedTagNames[this.tagName];
   }
   capitalizeString(this.tagName);
+};
+
+INTag.prototype.threads = function(optionalThreadsOrFilters, filters) {
+  var namespace = this.namespace();
+  var updateThreads = null;
+
+  if (!namespace) return this.promise(function(resolve, reject) {
+    reject(new Error('Cannot invoke `threads()` on INTag: not attached to a namespace.'));
+  });
+
+  if (optionalThreadsOrFilters && typeof optionalThreadsOrFilters === 'object') {
+    if (isArray(optionalThreadsOrFilters)) {
+      updateThreads = optionalThreadsOrFilters;
+    } else {
+      filters = optionalThreadsOrFilters;
+    }
+  }
+  if (!filters || typeof filters !== 'object') {
+    filters = {};
+  }
+  filters.tag = this.id;
+  return namespace.threads(updateThreads, filters);
 };
 
 defineResourceMapping(INTag, {

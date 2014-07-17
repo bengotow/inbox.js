@@ -1,11 +1,31 @@
 function INModelObject(inbox, id, namespaceId) {
   this.id = id || '-selfdefined';
+  var namespace;
   if (namespaceId) {
-    this.namespaceId = namespaceId;
+    if (typeof namespaceId === 'object') {
+      if (namespaceId instanceof INNamespace) {
+        namespace = namespaceId;
+        namespaceId = namespace.namespaceId();
+      } else {
+        namespace = new INNamespace(inbox, namespaceId, namespaceId);
+      }
+    }
+    this.namespaceID = namespaceId;
   }
   defineProperty(this, '_', INVISIBLE, null, null, {
-    inbox: inbox
+    inbox: inbox,
+    namespace: namespace
   });
+}
+
+
+INModelObject.prototype.namespace = function() {
+  if (this._.namespace) {
+    return this._.namespace;
+  } else if (this.namespaceId()) {
+    return (this._.namespace = getNamespace(this.inbox(), this.namespaceId()));
+  }
+  return null;
 };
 
 
@@ -15,7 +35,12 @@ INModelObject.prototype.baseUrl = function() {
 
 
 INModelObject.prototype.namespaceUrl = function() {
-  return urlFormat('%@/n/%@', this._.inbox.baseUrl(), this.namespaceId);
+  return urlFormat('%@/n/%@', this._.inbox.baseUrl(), this.namespaceId());
+};
+
+
+INModelObject.prototype.namespaceId = function() {
+  return this.namespaceID;
 };
 
 
@@ -171,7 +196,7 @@ function defineResourceMapping(resourceClass, mapping, base) {
     for (x in this) {
       this[x] = this[x];
     }
-  };
+  }
 
   if (!base && base !== null) {
     base = INModelObject;

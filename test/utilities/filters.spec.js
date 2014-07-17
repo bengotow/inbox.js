@@ -1,4 +1,4 @@
-describe('InboxURLFilters', function() {
+describe('applyFilters', function() {
   var i, ii, spec;
   var regexpFilters = ['subject'];
 
@@ -47,7 +47,7 @@ describe('InboxURLFilters', function() {
         function re(val) {
           var obj = {};
           obj[name] = val;
-          return InboxURLFilters(obj);
+          return applyFilters(obj);
         }
 
 
@@ -83,7 +83,7 @@ describe('InboxURLFilters', function() {
         function str(txt) {
           var obj = {};
           obj[name] = txt;
-          return InboxURLFilters(obj);
+          return applyFilters(obj);
         }
 
 
@@ -137,7 +137,7 @@ describe('InboxURLFilters', function() {
         function ts(txt) {
           var obj = {};
           obj[name] = txt;
-          return InboxURLFilters(obj);
+          return applyFilters(obj);
         }
 
 
@@ -209,7 +209,7 @@ describe('InboxURLFilters', function() {
         function int(txt) {
           var obj = {};
           obj[name] = txt;
-          return InboxURLFilters(obj);
+          return applyFilters(obj);
         }
 
 
@@ -274,7 +274,7 @@ describe('InboxURLFilters', function() {
 
 
   it('should remove unknown filters', function() {
-    expect(InboxURLFilters({
+    expect(applyFilters({
       'NOT_A_REAL_FILTER': '1403205152000'
     })).toBe('');
   });
@@ -282,7 +282,7 @@ describe('InboxURLFilters', function() {
 
   it('should combine filters', function() {
     var date = new Date();
-    expect(parseQuery(InboxURLFilters({
+    expect(parseQuery(applyFilters({
       subject: /^foo bar$/,
       lastMessageBefore: date,
       email: 'natasha@evilspy.com',

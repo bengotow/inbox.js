@@ -86,7 +86,7 @@ function MergeInboxSchemaCollection(schema, oldData, newData) {
     if (properties.isCollection) {
       // TODO(@caitp): support nested collection
     } else {
-      MergeArray(oldData, newData, schema.id, ValueFn);
+      mergeArray(oldData, newData, schema.id, valueFn);
     }
   }
 }

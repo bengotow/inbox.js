@@ -1,4 +1,4 @@
-xdescribe('InboxTag', function() {
+describe('INTag', function() {
   var haveOwnPromise = window.hasOwnProperty('Promise');
   var inbox;
   var server;
@@ -20,12 +20,26 @@ xdescribe('InboxTag', function() {
     "object": "tag"
   };
 
+	var mappedTag1 = {
+		"id": "all",
+		"tagName": "all",
+		"namespaceID": "fake_namespace_id",
+		"object": "tag"
+	};
+
   var mockTag2 = {
     "id": "unread",
     "name": "unread",
     "namespace": "fake_namespace_id",
     "object": "tag"
   };
+
+	var mappedTag2 = {
+		"id": "unread",
+		"tagName": "unread",
+		"namespaceID": "fake_namespace_id",
+		"object": "tag"
+	};
 
   var mockTags = [
     mockTag1,
@@ -128,11 +142,11 @@ xdescribe('InboxTag', function() {
 
 
   describe('INNamespace#tags()', function() {
-    it('should resolve promise with an Array of InboxTags', function() {
+    it('should resolve promise with an Array of INTags', function() {
       var fulfilled = jasmine.createSpy('load').andCallFake(function(tags) {
         expect(tags.length).toBe(2);
-        expect(tags[0] instanceof InboxTag).toBe(true);
-        expect(tags[1] instanceof InboxTag).toBe(true);
+        expect(tags[0] instanceof INTag).toBe(true);
+        expect(tags[1] instanceof INTag).toBe(true);
       });
       var promise = namespace.tags().then(fulfilled);
       server.respond([200, { "Content-Type": "application/json" }, JSON.stringify(mockTags)]);
@@ -141,24 +155,10 @@ xdescribe('InboxTag', function() {
     });
 
 
-    it('should copy properties from each thread object into new InboxTag', function() {
+    it('should copy mapped property values into resources', function() {
       var fulfilled = jasmine.createSpy('load').andCallFake(function(tags) {
-        expect(tags[0]).toContainObject(mockTag1);
-        expect(tags[1]).toContainObject(mockTag2);
-      });
-      var promise = namespace.tags().then(fulfilled);
-      server.respond([200, { "Content-Type": "application/json" }, JSON.stringify(mockTags)]);
-      mockPromises.executeForPromise(promise);
-      expect(fulfilled).toHaveBeenCalled();
-    });
-
-
-    it('should include tagId and tagName in INThread private properties', function() {
-      var fulfilled = jasmine.createSpy('load').andCallFake(function(tags) {
-        expect(tags[0]._.tagId).toBe('all');
-        expect(tags[0]._.tagName).toBe('all');
-        expect(tags[1]._.tagId).toBe('unread');
-        expect(tags[1]._.tagName).toBe('unread');
+        expect(tags[0]).toContainObject(mappedTag1);
+        expect(tags[1]).toContainObject(mappedTag2);
       });
       var promise = namespace.tags().then(fulfilled);
       server.respond([200, { "Content-Type": "application/json" }, JSON.stringify(mockTags)]);
@@ -182,8 +182,8 @@ xdescribe('InboxTag', function() {
         expect(tags.length).toBe(2);
         expect(tags).toBe(oldTags);
         expect(tags[0]).toBe(oldTags[0]);
-        expect(tags[1]).toContainObject(mockTag2);
-        expect(tags[1] instanceof InboxTag).toBe(true);
+        expect(tags[1]).toContainObject(mappedTag2);
+        expect(tags[1] instanceof INTag).toBe(true);
       });
       var promise = namespace.tags(oldTags).then(fulfilled);
       server.respond([200, { "Content-Type": "application/json" }, JSON.stringify(mockTags)]);
@@ -193,10 +193,10 @@ xdescribe('InboxTag', function() {
   });
 
 
-  describe('InboxTag#threads()', function() {
+  describe('INTag#threads()', function() {
     var tag;
     beforeEach(function() {
-      tag = new InboxTag(namespace, mockTag2);
+      tag = new INTag(namespace, mockTag2);
     });
 
 

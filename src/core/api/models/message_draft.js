@@ -17,11 +17,6 @@ function INDraft(inbox, id, namespaceId) {
 
 inherits(INDraft, INMessage);
 
-INTag.prototype.resourcePath = function() {
-  return urlFormat('%@/tags', this.namespaceId());
-};
-
 defineResourceMapping(INDraft, {
-  'tagName': 'name',
-  'object': 'const:tag'
+  'object': 'const:draft'
 });

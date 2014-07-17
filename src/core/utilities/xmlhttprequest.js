@@ -64,7 +64,6 @@ function ParseResponseHeaders(xhr) {
 
 function apiRequest(inbox, method, url, data, callback) {
   if (typeof data === 'function') {
-    isFiles = callback;
     callback = data;
     data = null;
   } else if (typeof data !== 'string' && typeof data !== 'object') {

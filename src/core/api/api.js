@@ -300,3 +300,5 @@ InboxAPI.prototype.namespaces = function(optionalNamespaces) {
     }
   });
 };
+
+

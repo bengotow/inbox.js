@@ -124,7 +124,7 @@ var FILTER_INTS = {
 
 var INT_REGEXP = /^((0x[0-9a-f]+)|([0-9]+))$/i;
 
-function InboxURLFilters(filters) {
+function applyFilters(filters) {
   var params;
   var key;
   var value;

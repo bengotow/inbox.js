@@ -53,7 +53,7 @@ function uploadFiles(namespace, filesOrFileName, fileDataOrCallback, callback) {
   var url = urlFormat('%@/files/', namespace.namespaceUrl());
   var data;
   if (isFiles(filesOrFileName)) {
-    data = createFormDataForFiles(files);
+    data = createFormDataForFiles(filesOrFileName);
   } else if (typeof filesOrFileName === 'string' && isBlob(fileDataOrCallback)) {
     data = createFormData(filesOrFileName, fileDataOrCallback);
   } else {
@@ -74,4 +74,4 @@ function uploadFiles(namespace, filesOrFileName, fileDataOrCallback, callback) {
       return item;
     }
   });
-};
+}
