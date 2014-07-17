@@ -20,12 +20,12 @@ describe('INTag', function() {
     "object": "tag"
   };
 
-	var mappedTag1 = {
-		"id": "all",
-		"tagName": "all",
-		"namespaceID": "fake_namespace_id",
-		"object": "tag"
-	};
+  var mappedTag1 = {
+    "id": "all",
+    "tagName": "all",
+    "namespaceID": "fake_namespace_id",
+    "object": "tag"
+  };
 
   var mockTag2 = {
     "id": "unread",
@@ -34,12 +34,12 @@ describe('INTag', function() {
     "object": "tag"
   };
 
-	var mappedTag2 = {
-		"id": "unread",
-		"tagName": "unread",
-		"namespaceID": "fake_namespace_id",
-		"object": "tag"
-	};
+  var mappedTag2 = {
+    "id": "unread",
+    "tagName": "unread",
+    "namespaceID": "fake_namespace_id",
+    "object": "tag"
+  };
 
   var mockTags = [
     mockTag1,

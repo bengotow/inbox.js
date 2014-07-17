@@ -5,14 +5,14 @@ function INNamespace(inbox, id) {
     id = data.id;
   }
   this.super(inbox, id, id);
-	this._.namespace = this;
+  this._.namespace = this;
   if (data) this.update(data);
 }
 
 inherits(INNamespace, INModelObject);
 
 INNamespace.prototype.namespace = function() {
-	return this;
+  return this;
 };
 
 INNamespace.prototype.resourcePath = function() {
@@ -156,22 +156,22 @@ INNamespace.prototype.tags = function(optionalTagsOrFilters, filters) {
 };
 
 INNamespace.prototype.uploadFile = function(fileNameOrFile, blobForFileName) {
-	var self = this;
-	return this.promise(function(resolve, reject) {
-		uploadFiles(self, fileNameOrFile, blobForFileName, function(err, response) {
-			if (err) {
-				if (typeof err == 'string') {
-					err = new Error('Cannot invoke `uploadFile()` on INNamespace: ' + err);
-				}
-				return reject(err);
-			}
-			return resolve(response);
-		});
-	});
+  var self = this;
+  return this.promise(function(resolve, reject) {
+    uploadFiles(self, fileNameOrFile, blobForFileName, function(err, response) {
+      if (err) {
+        if (typeof err == 'string') {
+          err = new Error('Cannot invoke `uploadFile()` on INNamespace: ' + err);
+        }
+        return reject(err);
+      }
+      return resolve(response);
+    });
+  });
 };
 
 function getNamespace(inbox, namespaceId) {
-	// TODO(@caitp): we should use LRU cache or something here, but since there's no way to know when
-	// namespaces are collected, it's probably better to just create a new instance all the time.
-	return new INNamespace(inbox, namespaceId);
+  // TODO(@caitp): we should use LRU cache or something here, but since there's no way to know when
+  // namespaces are collected, it's probably better to just create a new instance all the time.
+  return new INNamespace(inbox, namespaceId);
 }
