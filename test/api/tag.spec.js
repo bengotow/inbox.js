@@ -1,4 +1,4 @@
-describe('InboxTag', function() {
+xdescribe('InboxTag', function() {
   var haveOwnPromise = window.hasOwnProperty('Promise');
   var inbox;
   var server;
@@ -113,7 +113,7 @@ describe('InboxTag', function() {
       appId: '',
       baseUrl: 'http://api.inboxapp.co/'
     });
-    namespace = new InboxNamespace(inbox, mockNamespace);
+    namespace = new INNamespace(inbox, mockNamespace);
   });
 
 
@@ -127,7 +127,7 @@ describe('InboxTag', function() {
   });
 
 
-  describe('InboxNamespace#tags()', function() {
+  describe('INNamespace#tags()', function() {
     it('should resolve promise with an Array of InboxTags', function() {
       var fulfilled = jasmine.createSpy('load').andCallFake(function(tags) {
         expect(tags.length).toBe(2);
@@ -153,7 +153,7 @@ describe('InboxTag', function() {
     });
 
 
-    it('should include tagId and tagName in InboxThread private properties', function() {
+    it('should include tagId and tagName in INThread private properties', function() {
       var fulfilled = jasmine.createSpy('load').andCallFake(function(tags) {
         expect(tags[0]._.tagId).toBe('all');
         expect(tags[0]._.tagName).toBe('all');
@@ -205,9 +205,9 @@ describe('InboxTag', function() {
     });
 
 
-    it('should call InboxNamespace#threads() filtered by tagId', function() {
-      var threads = InboxNamespace.prototype.threads;
-      spyOn(InboxNamespace.prototype, 'threads').andCallFake(function(update, filters) {
+    it('should call INNamespace#threads() filtered by tagId', function() {
+      var threads = INNamespace.prototype.threads;
+      spyOn(INNamespace.prototype, 'threads').andCallFake(function(update, filters) {
         expect(typeof filters).toBe('object');
         expect(filters.tag).toBe('unread');
         return threads.call(this, update, filters);
@@ -217,14 +217,14 @@ describe('InboxTag', function() {
       server.respond([200, { "Content-Type": "application/json" }, JSON.stringify(mockThreads)]);
       mockPromises.executeForPromise(promise);
       expect(fulfilled).toHaveBeenCalled();
-      expect(InboxNamespace.prototype.threads).toHaveBeenCalled();
-      InboxNamespace.prototype.threads = threads;
+      expect(INNamespace.prototype.threads).toHaveBeenCalled();
+      INNamespace.prototype.threads = threads;
     });
 
 
     it('should override tag filter', function() {
-      var threads = InboxNamespace.prototype.threads;
-      spyOn(InboxNamespace.prototype, 'threads').andCallFake(function(update, filters) {
+      var threads = INNamespace.prototype.threads;
+      spyOn(INNamespace.prototype, 'threads').andCallFake(function(update, filters) {
         expect(typeof filters).toBe('object');
         expect(filters.tag).toBe('unread');
         return threads.call(this, update, filters);
@@ -236,8 +236,8 @@ describe('InboxTag', function() {
       server.respond([200, { "Content-Type": "application/json" }, JSON.stringify(mockThreads)]);
       mockPromises.executeForPromise(promise);
       expect(fulfilled).toHaveBeenCalled();
-      expect(InboxNamespace.prototype.threads).toHaveBeenCalled();
-      InboxNamespace.prototype.threads = threads;
+      expect(INNamespace.prototype.threads).toHaveBeenCalled();
+      INNamespace.prototype.threads = threads;
     });
   });
 });

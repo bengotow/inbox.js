@@ -2,7 +2,15 @@ var INVISIBLE = 1;
 var CONFIGURABLE = 2;
 var WRITABLE = 4;
 
-function DefineProperty(object, name, flags, get, set, value) {
+function hasProperty(obj, propertyName) {
+  if (obj === null || obj === undefined) {
+    return false;
+  }
+  return (obj.hasOwnProperty && obj.hasOwnProperty(propertyName)) ||
+          Object.prototype.hasOwnProperty.call(obj, propertyName);
+}
+
+function defineProperty(object, name, flags, get, set, value) {
   if (Object.defineProperty) {
     var defn = {
       enumerable: !(flags & INVISIBLE),
@@ -18,5 +26,11 @@ function DefineProperty(object, name, flags, get, set, value) {
       defn.value = value;
     }
     Object.defineProperty(object, name, defn);
+  } else {
+    if (typeof get === "function") {
+      object[name] = get();
+    } else if (arguments.length > 5) {
+      object[name] = value;
+    }
   }
 }

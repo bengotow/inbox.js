@@ -79,12 +79,25 @@ function InboxAPI(optionsOrAppId, optionalBaseUrl, optionalPromiseConstructor) {
     return new InboxAPI(options);
   }
 
-  options._cache = {};
+  var cache = INStubCache;
 
-  options.http = Merge(Merge({}, DEFAULT_HTTP), (typeof options.http === 'object' && options.http));
+  if (options.cache) {
+    if (!INCache.isRegistered(options.cache)) {
+      throw new TypeError('Cache ' + options.cache + ' is not registered.');
+    }
+    cache = options.cache;
+  }
+
+  if (typeof cache === 'function') {
+    options.cache = new cache(this, options.cacheId);
+  } else {
+    options.cache = cache;
+  }
+
+  options.http = merge(merge({}, DEFAULT_HTTP), (typeof options.http === 'object' && options.http));
 
   this._ = options;
-  DefineProperty(this, '_', INVISIBLE);
+  defineProperty(this, '_', INVISIBLE);
 }
 
 /**
@@ -105,7 +118,7 @@ function InboxAPI(optionsOrAppId, optionalBaseUrl, optionalPromiseConstructor) {
  */
 InboxAPI.prototype.http = function(key, value) {
   if (!this._.http || typeof this._.http !== 'object') {
-    this._.http = Merge({}, DEFAULT_HTTP);
+    this._.http = merge({}, DEFAULT_HTTP);
   }
 
   if (!arguments.length) {
@@ -217,4 +230,73 @@ InboxAPI.prototype.forEachRequestHeader = function(fn, thisArg) {
   }
 
   return this;
+};
+
+defineProperty(InboxAPI.prototype, 'promise', INVISIBLE, null, null, function(resolver) {
+  return this._.promise(resolver);
+});
+
+InboxAPI.prototype.baseUrl = function() {
+  return this._.baseUrl;
+};
+
+InboxAPI.prototype.namespace = function(namespaceId) {
+  var self = this;
+  var cache = this._.cache;
+  if (!arguments.length) {
+    throw new TypeError(
+      "Unable to perform 'namespace()' on InboxAPI: missing option `namespaceId`.");
+  } else if (typeof namespaceId !== 'string') {
+    throw new TypeError(
+      "Unable to perform 'namespace()' on InboxAPI: namespaceId must be a string.");
+  }
+  return this.promise(function(resolve, reject) {
+    cache.get(namespaceId, function(err, obj) {
+      if (err) return reject(err);
+      if (obj) return namespaceReady(null, obj);
+      apiRequest(self, 'get', urlFormat('%@/n/%@', self.baseUrl(), namespaceId), namespaceReady);
+
+      function namespaceReady(err, data) {
+        if (err) return reject(err);
+        cache.persist(namespaceId, data, noop);
+        resolve(new INNamespace(self, data));
+      }
+    });
+  });
+};
+
+InboxAPI.prototype.namespaces = function(optionalNamespaces) {
+  var self = this;
+  var cache = this._.cache;
+  var updateNamespaces = null;
+
+  if (isArray(optionalNamespaces)) {
+    updateNamespaces = optionalNamespaces;
+  }
+
+  return this.promise(function(resolve, reject) {
+    cache.getByType('namespace', function(err, set) {
+      if (err) return reject(err);
+      if (set && set.length) return namespacesReady(null, set);
+      apiRequest(self, 'get', urlFormat('%@/n/', self.baseUrl()), namespacesReady);
+    });
+
+    function namespacesReady(err, set) {
+      if (err) return reject(err);
+
+      if (updateNamespaces) {
+        return resolve(mergeArray(updateNamespaces, set, 'id', function(data) {
+          cache.persist(data.id, data, noop);
+          return new INNamespace(self, data);
+        }));
+      }
+
+      set = map(set, function(item) {
+        cache.persist(item.id, item, noop);
+        return new INNamespace(self, item);
+      });
+
+      resolve(set);
+    }
+  });
 };

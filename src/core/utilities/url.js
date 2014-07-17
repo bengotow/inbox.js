@@ -12,7 +12,7 @@ function URLAddPaths(url, paths) {
   return url;
 }
 
-function URLFormat(template, args) {
+function urlFormat(template, args) {
   var i = 0;
   var ii;
   args = Array.prototype.slice.call(arguments, 1);
@@ -20,7 +20,9 @@ function URLFormat(template, args) {
 
   return template.replace(/\%\@/g, function() {
     if (i < ii) {
-      return ('' + args[i++]).
+      var str = args[i++];
+      if (typeof str === 'undefined') return '';
+      return ('' + str).
         replace(/^\/+/, '').
         replace(/\/+$/, '');
     }
@@ -32,7 +34,7 @@ var ARRAY_BRACKET_REGEXP = /\[\]$/;
 
 function BuildURLParams(key, value, add) {
   var i, ii, name, v, classicArray = false;
-  if (IsArray(value)) {
+  if (isArray(value)) {
     classicArray = key.test(ARRAY_BRACKET_REGEXP);
     for (i=0, ii=value.length; i<ii; ++i) {
       v = value[i];
@@ -127,7 +129,7 @@ function InboxURLFilters(filters) {
   var key;
   var value;
   var result = '';
-  if (!filters || typeof filters !== "object" || IsArray(filters)) {
+  if (!filters || typeof filters !== "object" || isArray(filters)) {
     return '';
   }
 

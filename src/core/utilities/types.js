@@ -1,4 +1,4 @@
-var IsArray = (function() {
+var isArray = (function() {
   if (typeof Array.isArray === 'function') {
     return Array.isArray;
   }

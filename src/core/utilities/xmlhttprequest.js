@@ -28,13 +28,16 @@ function XHRData(xhr, response) {
   };
 }
 
-function RejectXHR(reject, xhr, type) {
+function RejectXHR(cb, xhr, type) {
   return function() {
+    if (!cb.cb) return;
+    var callback = cb.cb;
+    cb.cb = null;
     var response = null;
     if (type === 'json') {
-      response = ParseJSON('response' in xhr ? xhr.response : xhr.responseText);
+      response = parseJSON('response' in xhr ? xhr.response : xhr.responseText);
     }
-    reject(XHRData(xhr, response));
+    callback(XHRData(xhr, response), null);
   };
 }
 
@@ -59,41 +62,66 @@ function ParseResponseHeaders(xhr) {
   return headers;
 }
 
-function XHR(inbox, method, url, data, onload) {
+function apiRequest(inbox, method, url, data, callback) {
   if (typeof data === 'function') {
-    onload = data;
+    isFiles = callback;
+    callback = data;
+    data = null;
+  } else if (typeof data !== 'string' && typeof data !== 'object') {
+    data = null;
+  }
+
+  if (typeof callback !== 'function') {
+    callback = noop;
+  }
+
+  var cb = {cb: callback};
+  var xhr = XHRForMethod(method);
+
+  xhr.withCredentials = inbox.withCredentials();    
+  var failed = RejectXHR(cb, xhr, 'json');
+  AddListeners(xhr, {
+    'load': function(event) {
+      if (!cb.cb) return;
+      var response = parseJSON('response' in xhr ? xhr.response : xhr.responseText);
+      if (xhr.status >= 200 && xhr.status < 300) {
+        callback(null, response);
+      } else {
+        callback(XHRData(xhr, response), null);
+      }
+    },
+    // TODO: retry count depending on status?
+    'error': failed,
+
+    'abort': failed
+    // TODO: timeout/progress events are useful.
+  });
+
+  XHRMaybeJSON(xhr);
+
+  xhr.open(method, url);
+
+  inbox.forEachRequestHeader(xhr.setRequestHeader, xhr);
+
+  xhr.send(data);
+}
+
+
+function apiRequestPromise(inbox, method, url, data, callback) {
+  if (typeof data === 'function') {
+    callback = data;
     data = null;
   } else if (typeof data !== 'string') {
     data = null;
   }
+  if (typeof callback !== 'function') {
+    callback = valueFn;
+  }
 
-  return inbox._.promise(function(resolve, reject) {
-    var xhr = XHRForMethod(method);
-
-    xhr.withCredentials = inbox.withCredentials();    
-
-    AddListeners(xhr, {
-      'load': function(event) {
-        var response = ParseJSON('response' in xhr ? xhr.response : xhr.responseText);
-        if (xhr.status >= 200 && xhr.status < 300) {
-          resolve(onload(response));
-        } else {
-          reject(XHRData(xhr, response));
-        }
-      },
-      // TODO: retry count depending on status?
-      'error': RejectXHR(reject, xhr, 'json'),
-
-      'abort': RejectXHR(reject, xhr, 'json')
-      // TODO: timeout/progress events are useful.
+  return inbox.promise(function(resolve, reject) {
+    apiRequest(inbox, method, url, data, function(err, value) {
+      if (err) return reject(err);
+      return resolve(callback(value));
     });
-
-    XHRMaybeJSON(xhr);
-
-    xhr.open(method, url);
-
-    inbox.forEachRequestHeader(xhr.setRequestHeader, xhr);
-
-    xhr.send(data);
   });
 }
