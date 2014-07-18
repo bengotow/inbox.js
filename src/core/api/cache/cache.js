@@ -23,6 +23,12 @@ INCache.prototype.persist = function(id, object, callback) {
     name, name));
 };
 
+INCache.prototype.remove = function(id, callback) {
+  var name = this.cacheType || this.constructor.name || 'Cache';
+  throw new Error(formatString('cannot invoke %@#remove(): %@#remove() is not implemented.',
+    name, name));
+};
+
 var caches = {};
 
 defineProperty(INCache, 'register', 0, null, null, function(name, constructor) {
@@ -68,6 +74,15 @@ function persistModel(obj) {
     var inbox = obj.inbox();
     if (inbox) {
       inbox._.cache.persist(obj.id, obj.raw(), noop);
+    }
+  }
+}
+
+function deleteModel(obj) {
+  if (obj instanceof INModelObject) {
+    var inbox = obj.inbox();
+    if (inbox) {
+      inbox._.cache.remove(obj.id, noop);
     }
   }
 }

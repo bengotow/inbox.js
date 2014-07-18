@@ -16,3 +16,6 @@ INStubCache.prototype.persist = function(id, object, callback) {
   callback(null, null);
 };
 
+INStubCache.prototype.remove = function(id, callback) {
+  callback(null, null);
+};

@@ -25,6 +25,13 @@ INThread.prototype.resourcePath = function() {
 };
 
 
+INThread.prototype.reply = function() {
+  var draft = new INDraft(this.namespace(), null);
+  draft.thread = this.id;
+  return draft;
+};
+
+
 defineResourceMapping(INThread, {
   'subject': 'subject',
   'participants': 'array:participants',

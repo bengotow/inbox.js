@@ -121,3 +121,20 @@ INIDBCache.prototype.persist = function(id, object, callback) {
     };
   });
 };
+
+INIDBCache.prototype.remove = function(id, callback) {
+  INIDBCacheDB(this, function(err, db) {
+    if (err) return callback(err, null);
+    var transaction = db.transaction('resources');
+    var store = transaction.objectStore('resources', 'readwrite');
+    var req = store.delete(id);
+    transaction.onsuccess = function() {
+      callback(null, req.result);
+    };
+
+    transaction.onerror = function() {
+      callback(req.error, null);
+    };
+  });
+};
+

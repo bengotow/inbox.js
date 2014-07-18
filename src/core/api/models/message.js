@@ -40,6 +40,37 @@ INMessage.prototype.attachments = function() {
   return array;
 };
 
+INMessage.prototype.attachment = function(indexOrId) {
+  var index;
+  if (typeof indexOrId === 'number') {
+    index = indexOrId >>> 0;
+  } else if (typeof indexOrId === 'string') {
+    var i;
+    var ii = this.attachmentIDs.length;
+    for (i=0; i<ii; ++i) {
+      if (indexOrId === this.attachmentIDs[i]) {
+        index = i;
+        break;
+      }
+    }
+  } else {
+    throw new TypeError(
+      'Cannot invoke `attachment()` on INMessage: expected attachment index or attachment ID');
+  }
+
+  if (typeof index === 'undefined') {
+    return null;
+  }
+
+  var element = this.attachmentIDs[index];
+
+  if (typeof element === 'undefined') {
+    return null;
+  }
+
+  return new INFile(this.inbox(), element, this.namespaceId());
+};
+
 INMessage.prototype.markAsRead = function() {
   var self = this;
   if (this.isUnsynced()) {

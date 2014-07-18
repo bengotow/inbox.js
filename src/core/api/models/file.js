@@ -43,7 +43,7 @@ defineResourceMapping(INFile, {
 });
 
 
-function uploadFiles(namespace, filesOrFileName, fileDataOrCallback, callback) {
+function uploadFile(namespace, fileOrFileName, fileDataOrCallback, callback) {
   if (typeof callback !== 'function') {
     callback = fileDataOrCallback;
     fileDataOrCallback = null;
@@ -51,22 +51,19 @@ function uploadFiles(namespace, filesOrFileName, fileDataOrCallback, callback) {
 
   var inbox = namespace.inbox();
   var url = urlFormat('%@/files/', namespace.namespaceUrl());
-  var data;
-  if (isFiles(filesOrFileName)) {
-    data = createFormDataForFiles(filesOrFileName);
-  } else if (typeof filesOrFileName === 'string' && isBlob(fileDataOrCallback)) {
-    data = createFormData(filesOrFileName, fileDataOrCallback);
+  var data = new window.FormData();
+  if (isFile(fileOrFileName)) {
+    data.append('file', fileOrFileName);
+  } else if (typeof fileOrFileName === 'string' && isBlob(fileDataOrCallback)) {
+    data.append('file', fileDataOrCallback, fileOrFileName);
   } else {
-    return callback('', null);
+    return callback('not a file', null);
   }
+
   apiRequest(inbox, 'post', url, data, function(err, response) {
     if (err) return callback(err, null);
 
-    if (isArray(response)) {
-      callback(null, map(response, makeFile));
-    } else {
-      callback(null, makeFile(response));
-    }
+    callback(null, makeFile(response));
 
     function makeFile(item) {
       item = new INFile(namespace, item);

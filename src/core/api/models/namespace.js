@@ -158,7 +158,7 @@ INNamespace.prototype.tags = function(optionalTagsOrFilters, filters) {
 INNamespace.prototype.uploadFile = function(fileNameOrFile, blobForFileName) {
   var self = this;
   return this.promise(function(resolve, reject) {
-    uploadFiles(self, fileNameOrFile, blobForFileName, function(err, response) {
+    uploadFile(self, fileNameOrFile, blobForFileName, function(err, response) {
       if (err) {
         if (typeof err == 'string') {
           err = new Error('Cannot invoke `uploadFile()` on INNamespace: ' + err);
