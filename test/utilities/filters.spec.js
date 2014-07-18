@@ -147,14 +147,14 @@ describe('applyFilters', function() {
 
 
         it('should accept ISO-8601 String', function() {
-          expect(ts('2014-06-19')).toBeQuery('?%@=1403136000000');
-          expect(ts('2014-06-19T19:12:32+00:00')).toBeQuery('?%@=1403205152000');
-          expect(ts('2014-06-19T19:12:32Z')).toBeQuery('?%@=1403205152000');
+          expect(ts('2014-06-19')).toBeQuery('?%@=1403136000');
+          expect(ts('2014-06-19T19:12:32+00:00')).toBeQuery('?%@=1403205152');
+          expect(ts('2014-06-19T19:12:32Z')).toBeQuery('?%@=1403205152');
         });
 
 
         it('should accept Number', function() {
-          expect(ts(1403205152000)).toBeQuery('?%@=1403205152000');
+          expect(ts(1403205152)).toBeQuery('?%@=1403205152');
         });
 
 
@@ -188,12 +188,12 @@ describe('applyFilters', function() {
 
         it('should serialize Date', function() {
           var date = new Date(1403205152000);
-          expect(ts(date)).toBeQuery('?%@=1403205152000');
+          expect(ts(date)).toBeQuery('?%@=1403205152');
         });
 
 
         it('should serialize result of functions', function() {
-          expect(ts(function() { return '1403205152000'; })).toBeQuery('?%@=1403205152000');
+          expect(ts(function() { return '1403205152'; })).toBeQuery('?%@=1403205152');
         });
       });
     })(timestampFilters[i]);
@@ -282,6 +282,7 @@ describe('applyFilters', function() {
 
   it('should combine filters', function() {
     var date = new Date();
+    var expectDate = ((date.getTime() / 1000) >>> 0);
     expect(parseQuery(applyFilters({
       subject: /^foo bar$/,
       lastMessageBefore: date,
@@ -289,7 +290,7 @@ describe('applyFilters', function() {
       from: 'boris@evilspy.com'
     }))).toContainObject({
       subject: '/^foo+bar$/',
-      last_message_before: '' + date.getTime(),
+      last_message_before: '' + expectDate,
       any_email: 'natasha@evilspy.com',
       from: 'boris@evilspy.com'
     });

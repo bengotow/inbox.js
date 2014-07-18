@@ -60,7 +60,7 @@ describe('INThread', function() {
     "object": "thread",
     "namespaceID": "fake_namespace_id",
     "subject": "Mock Thread 1",
-    "lastMessageDate": new Date(1398229259),
+    "lastMessageDate": new Date(1398229259000),
     "participants": [
       {
         "name": "Ben Bitdiddle",
@@ -155,7 +155,7 @@ describe('INThread', function() {
     "object": "thread",
     "namespaceID": "fake_namespace_id",
     "subject": "Mock Thread 2",
-    "lastMessageDate": new Date(1399238467),
+    "lastMessageDate": new Date(1399238467000),
     "participants": [
       {
         "name": "Ben Bitdiddle",

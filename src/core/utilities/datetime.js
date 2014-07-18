@@ -13,7 +13,7 @@ var DateParse = (function() {
     return Date.parse;
   } else {
     return function(dateString) {
-      return (new Date(dateString)).getTime() / 1000;
+      return (new Date(dateString)).getTime();
     };
   }
 })();
@@ -21,13 +21,15 @@ var DateParse = (function() {
 function ToUnixTimestamp(date) {
   var timestamp;
   if (typeof date === "number") {
-    return date >>> 0;
+    return date;
   } else if (typeof date === "string") {
     // if Number(date) is not NaN, then we can treat it as a timestamp ---
     // Otherwise, see if Date can parse it, and use the Date timestamp.
     timestamp = Number(date);
     if (timestamp !== timestamp) {
       timestamp = DateParse(date);
+      if (timestamp !== timestamp) return timestamp;
+      timestamp = (timestamp / 1000) >>> 0;
     }
     // May be NaN
     return timestamp;
@@ -36,7 +38,7 @@ function ToUnixTimestamp(date) {
     // If the object isn't recognized, try to use the results of toString()
     // and parse it as a string.
     if (date instanceof Date) {
-      return date.getTime() / 1000;
+      return (date.getTime() / 1000) >>> 0;
     } else if (typeof (timestamp = date.toString()) === "string") {
       return ToUnixTimestamp(timestamp);
     }
