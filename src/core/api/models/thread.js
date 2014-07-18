@@ -32,6 +32,43 @@ INThread.prototype.reply = function() {
 };
 
 
+INThread.prototype.messages = function(optionalMessagesOrFilters, filters) {
+  var self = this;
+  var updateMessages = null;
+
+  if (optionalMessagesOrFilters && typeof optionalMessagesOrFilters === 'object') {
+    if (isArray(optionalMessagesOrFilters)) {
+      updateMessages = optionalMessagesOrFilters;
+    } else {
+      filters = optionalMessagesOrFilters;
+    }
+  }
+
+  if (!filters || typeof filters !== 'object') {
+    filters = {};
+  }
+
+  filters.thread = this.id;
+
+  return this.promise(function(resolve, reject) {
+    var url = urlFormat('%@/messages%@', self.namespaceUrl(), applyFilters(filters));
+    apiRequest(self.inbox(), 'get', url, function(err, response) {
+      if (err) return reject(err);
+      if (updateMessages) {
+        return resolve(mergeArray(updateMessages, response, 'id', function(data) {
+          persistModel(data = new INMessage(self.inbox(), data));
+          return data;
+        }));
+      }
+      return resolve(map(response, function(data) {
+        persistModel(data = new INMessage(self.inbox(), data));
+        return data;
+      }));
+    });
+  });
+};
+
+
 defineResourceMapping(INThread, {
   'subject': 'subject',
   'participants': 'array:participants',

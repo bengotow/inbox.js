@@ -194,7 +194,9 @@ function defineResourceMapping(resourceClass, mapping, base) {
   function resourceMapping() {
     var x;
     for (x in this) {
-      this[x] = this[x];
+      if (x !== 'jsonKeys' && x !== 'resourceMapping') {
+        this[x] = this[x];
+      }
     }
   }
 
