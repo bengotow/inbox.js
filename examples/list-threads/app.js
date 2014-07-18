@@ -82,7 +82,7 @@ controller('threadsCtrl', ['$scope', '$namespaces', function(scope, $namespaces)
       angular.element(selectedNode).addClass('active');
     }
     if (thread) {
-      thread.getMessages().then(function(messages) {
+      thread.messages().then(function(messages) {
         self.selectedThreadMessages = messages;
       }, function() {
         // show error message
