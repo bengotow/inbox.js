@@ -11,7 +11,7 @@ function INDraft(inbox, id, namespaceId) {
     id = data.id;
     namespaceId = data.namespace || data.namespaceId;
   }
-  this.super(inbox, id, namespaceId);
+  INMessage.call(this, inbox, id, namespaceId);
   if (data) this.update(data);
 }
 
@@ -117,4 +117,4 @@ INDraft.prototype.dispose = function() {
 defineResourceMapping(INDraft, {
 	'thread': 'reply_to_thread',
   'object': 'const:draft'
-});
+}, INMessage);

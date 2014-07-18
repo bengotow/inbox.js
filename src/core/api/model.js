@@ -80,7 +80,7 @@ INModelObject.prototype.update = function(data) {
       } else {
         currentValue = data[jsonKey];
         if (typeof currentValue !== 'undefined') {
-          cast = cast(currentValue);
+          cast = cast(currentValue, mappingInfo);
           isObject = cast && typeof cast === 'object';
           if (!this[propertyName] || !isObject || !merge) {
             this[propertyName] = cast;
@@ -111,7 +111,7 @@ INModelObject.prototype.raw = function() {
         out[jsonKey] = cnst;
       } else {
         currentValue = this[propertyName];
-        cast = cast(currentValue);
+        cast = cast(currentValue, mappingInfo);
         isObject = cast && typeof cast === 'object';
         if (typeof currentValue !== 'undefined') {
           if (!isObject || !cast) {
@@ -146,7 +146,7 @@ var casters = {
     to: function castToDate(val) {
       var v;
       switch (typeof val) {
-      case 'number': return new Date(val >>> 0);
+      case 'number': return new Date((val >>> 0) * 1000);
       case 'string': return new Date(val);
       case 'object':
         if (val === null) return null;
@@ -165,7 +165,7 @@ var casters = {
       case 'object':
         if (val === null) return null;
         if (typeof val.valueOf === 'function' && typeof (v = val.valueOf()) === 'number') return v;
-        if (val instanceof Date) return val.getTime();
+        if (val instanceof Date) return (val.getTime() / 1000) >>> 0;
         /* falls through */
       default:
         return;
@@ -184,6 +184,10 @@ var casters = {
 
   bool: function castToBool(val) {
     return !!val;
+  },
+
+  'const': function castToConst(val, info) {
+    return info.cnst;
   }
 };
 

@@ -1,5 +1,5 @@
 function INStubCache(inbox) {
-  this.super(inbox);
+  INCache.call(this, inbox);
 }
 
 INCache.register('stub', INStubCache);

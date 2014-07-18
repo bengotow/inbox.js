@@ -11,7 +11,7 @@ function INThread(inbox, id, namespaceId) {
     id = data.id;
     namespaceId = data.namespace || data.namespaceId;
   }
-  this.super(inbox, id, namespaceId);
+  INModelObject.call(this, inbox, id, namespaceId);
   if (data) this.update(data);
 }
 
@@ -71,6 +71,7 @@ INThread.prototype.messages = function(optionalMessagesOrFilters, filters) {
 
 defineResourceMapping(INThread, {
   'subject': 'subject',
+  'subjectDate': 'date:subject_date',
   'participants': 'array:participants',
   'lastMessageDate': 'date:last_message_timestamp',
   'messageIDs': 'array:messages',

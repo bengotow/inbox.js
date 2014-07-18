@@ -4,7 +4,7 @@ function INNamespace(inbox, id) {
     data = id;
     id = data.id;
   }
-  this.super(inbox, id, id);
+  INModelObject.call(this, inbox, id, id);
   this._.namespace = this;
   if (data) this.update(data);
 }
@@ -168,6 +168,10 @@ INNamespace.prototype.uploadFile = function(fileNameOrFile, blobForFileName) {
       return resolve(response);
     });
   });
+};
+
+INNamespace.prototype.draft = function() {
+	return new INDraft(this, null);
 };
 
 function getNamespace(inbox, namespaceId) {

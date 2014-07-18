@@ -10,7 +10,7 @@ function INIDBCache(inbox, name) {
   if (!haveIndexedDB) {
     throw new TypeError('IndexedDB is not supported in this browser.');
   }
-  this.super(inbox, name);  
+  INCache.call(this, inbox, name);  
 }
 
 if (haveIndexedDB) {
