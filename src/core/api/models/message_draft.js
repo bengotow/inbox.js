@@ -17,6 +17,20 @@ function INDraft(inbox, id, namespaceId) {
 
 inherits(INDraft, INMessage);
 
+INDraft.prototype.addRecipients = function(participants) {
+  var to = this.to || (this.to = []);
+  var i;
+  var ii = arguments.length;
+  var item;
+  for (i=0; i<ii; ++i) {
+    item = arguments[i];
+    if (isArray(item)) {
+      mergeArray(to, item, 'email');
+    }
+  }
+  return this;
+};
+
 INDraft.prototype.uploadAttachment = function(fileNameOrFile, blobForFileName) {
   var namespace = this.namespace();
 	var self = this;
@@ -79,8 +93,11 @@ INDraft.prototype.send = function() {
 	var url = urlFormat('%@/send', this.namespaceUrl());
 
 	if (this.isUnsynced()) {
-		// Just send a message
-		data = this.toJSON();
+    // Just send a message
+    data = this.raw();
+    delete data.id;
+    delete data.object;
+    data = toJSON(data);
 	} else {
 		// Send using the saved ID
 		data = toJSON({

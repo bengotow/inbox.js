@@ -226,6 +226,8 @@ function defineResourceMapping(resourceClass, mapping, base) {
           if ((split = jsonKey.indexOf(':')) >= 0) {
             cnst = jsonKey.substring(split + 1);
             jsonKey = jsonKey.substring(0, split);
+          } else {
+            jsonKey = propertyName;
           }
         }
         if (!hasProperty(casters, type)) {

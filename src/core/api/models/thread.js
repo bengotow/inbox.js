@@ -26,7 +26,9 @@ INThread.prototype.resourcePath = function() {
 
 
 INThread.prototype.reply = function() {
-  var draft = new INDraft(this.namespace(), null);
+  var data = this.raw();
+  delete data.id;
+  var draft = new INDraft(this.namespace(), data);
   draft.thread = this.id;
   return draft;
 };

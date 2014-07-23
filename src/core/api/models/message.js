@@ -32,6 +32,12 @@ INMessage.prototype.thread = function() {
   return new INThread(this.inbox(), this.threadID, this.namespaceId());
 };
 
+INMessage.prototype.reply = function() {
+  var draft = this.thread().reply();
+  draft.addRecipients(this.from, this.to);
+  return draft;
+};
+
 INMessage.prototype.attachments = function() {
   var array = new Array(this.attachmentIDs.length);
   forEach(this.attachmentIDs, function(id, i) {
