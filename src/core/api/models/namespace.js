@@ -133,7 +133,7 @@ INNamespace.prototype.tags = function(optionalTagsOrFilters, filters) {
     cache.getByType('namespace', function(err, set) {
       if (err) return reject(err);
       if (set && set.length) return tagsReady(null, set);
-      apiRequest(inbox, 'get', urlFormat('%@/threads',
+      apiRequest(inbox, 'get', urlFormat('%@/tags',
         self.resourcePath()), tagsReady);
     });
 
