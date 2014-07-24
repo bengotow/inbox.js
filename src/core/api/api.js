@@ -240,6 +240,10 @@ InboxAPI.prototype.baseUrl = function() {
   return this._.baseUrl;
 };
 
+InboxAPI.prototype.appId = function() {
+  return this._.appId;
+};
+
 InboxAPI.prototype.namespace = function(namespaceId) {
   var self = this;
   var cache = this._.cache;
