@@ -29,12 +29,13 @@ INThread.prototype.reply = function() {
   var data = this.raw();
   delete data.id;
   var draft = new INDraft(this.namespace(), data);
+  draft.to = data.participants;
   draft.thread = this.id;
   return draft;
 };
 
 
-INThread.prototype.messages = function(optionalMessagesOrFilters, filters) {
+function getter(klass, endpoint, optionalMessagesOrFilters, filters) {
   var self = this;
   var updateMessages = null;
 
@@ -53,23 +54,30 @@ INThread.prototype.messages = function(optionalMessagesOrFilters, filters) {
   filters.thread = this.id;
 
   return this.promise(function(resolve, reject) {
-    var url = urlFormat('%@/messages%@', self.namespaceUrl(), applyFilters(filters));
+    var url = urlFormat('%@/%@%@', self.namespaceUrl(), endpoint, applyFilters(filters));
     apiRequest(self.inbox(), 'get', url, function(err, response) {
       if (err) return reject(err);
       if (updateMessages) {
         return resolve(mergeArray(updateMessages, response, 'id', function(data) {
-          persistModel(data = new INMessage(self.inbox(), data));
+          persistModel(data = new klass(self.inbox(), data));
           return data;
         }));
       }
       return resolve(map(response, function(data) {
-        persistModel(data = new INMessage(self.inbox(), data));
+        persistModel(data = new klass(self.inbox(), data));
         return data;
       }));
     });
   });
 };
 
+INThread.prototype.messages = function(optionalMessagesOrFilters, filters) {
+  return getter.call(this, INMessage, 'messages', optionalMessagesOrFilters, filters);
+};
+
+INThread.prototype.drafts = function(optionalMessagesOrFilters, filters) {
+  return getter.call(this, INDraft, 'drafts', optionalMessagesOrFilters, filters);
+};
 
 defineResourceMapping(INThread, {
   'subject': 'subject',
