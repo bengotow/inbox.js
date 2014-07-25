@@ -30,7 +30,7 @@ INFile.prototype.download = function() {
   var url = urlFormat('%@/files/%@/download', this.namespaceUrl(), this.id);
 
   var filename = this.filename || this.id;
-  var content_type = this.content_type || text/plain;charset=utf-8;
+  var content_type = this.content_type || "text/plain;charset=utf-8";
   apiRequestData(inbox, 'get', url, function(err, response) {
     if (err) console.log('error getting');
     else {
