@@ -71,6 +71,25 @@ function getter(klass, endpoint, optionalMessagesOrFilters, filters) {
   });
 };
 
+INThread.prototype.updateTags = function(addTags, removeTags) {
+  var self = this;
+  var url = urlFormat('%@/threads/%@', this.namespaceUrl(), this.id);
+  return apiRequestPromise(this.inbox(), 'put', url,
+    {"add_tags" : addTags, "remove_tags" : removeTags },
+    function(value) {
+      self.reload();
+      return self;
+    });
+}
+
+INThread.prototype.addTags = function(tags) {
+  return this.updateTags(tags, []);
+};
+
+INThread.prototype.removeTags = function(tags) {
+  return this.updateTags([], tags);
+};
+
 INThread.prototype.messages = function(optionalMessagesOrFilters, filters) {
   return getter.call(this, INMessage, 'messages', optionalMessagesOrFilters, filters);
 };
