@@ -105,6 +105,51 @@ function apiRequest(inbox, method, url, data, callback) {
   xhr.send(data);
 }
 
+function apiRequestData(inbox, method, url, data, callback) {
+  if (typeof data === 'function') {
+    callback = data;
+    data = null;
+  } else if (typeof data !== 'string' && typeof data !== 'object') {
+    data = null;
+  }
+
+  if (typeof callback !== 'function') {
+    callback = noop;
+  }
+
+  var cb = {cb: callback};
+  var xhr = XHRForMethod(method);
+
+  xhr.withCredentials = inbox.withCredentials();    
+  var failed = RejectXHR(cb, xhr, 'json');
+  AddListeners(xhr, {
+    'load': function(event) {
+      if (!cb.cb) return;
+      var response = 'response' in xhr ? xhr.response : xhr.responseText;
+      if (xhr.status >= 200 && xhr.status < 300) {
+        callback(null, response);
+      } else {
+        callback(XHRData(xhr, response), null);
+      }
+    },
+    // TODO: retry count depending on status?
+    'error': failed,
+
+    'abort': failed
+    // TODO: timeout/progress events are useful.
+  });
+
+  XHRMaybeJSON(xhr);
+
+  xhr.open(method, url);
+  xhr.responseType = "arraybuffer";
+
+  inbox.forEachRequestHeader(xhr.setRequestHeader, xhr);
+
+  xhr.send(data);
+}
+
+
 
 function apiRequestPromise(inbox, method, url, data, callback) {
   if (typeof data === 'function') {

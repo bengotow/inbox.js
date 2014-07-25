@@ -38,13 +38,22 @@ INMessage.prototype.reply = function() {
   return draft;
 };
 
-INMessage.prototype.attachments = function() {
-  var array = new Array(this.attachmentIDs.length);
-  forEach(this.attachmentIDs, function(id, i) {
-    array[i] = new INFile(this.inbox(), id, this.namespaceId());
-  }, this);
-  return array;
-};
+
+INMessage.prototype.fattachments = function() {
+  var self = this;
+  var filters = {};
+  return this.promise(function(resolve, reject) {
+    var url = urlFormat('%@/files%@', self.namespaceUrl(), applyFilters(filters));
+    apiRequest(self.inbox(), 'get', url, function(err, response) {
+      if (err) return reject(err);
+      return resolve(map(response, function(data) {
+        persistModel(data = new INFile(self.inbox(), data));
+        return data;
+      }));
+    });
+  });
+}
+
 
 INMessage.prototype.attachment = function(indexOrId) {
   var index;
