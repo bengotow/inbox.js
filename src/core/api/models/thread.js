@@ -74,12 +74,17 @@ function getter(klass, endpoint, optionalMessagesOrFilters, filters) {
 INThread.prototype.updateTags = function(addTags, removeTags) {
   var self = this;
   var url = urlFormat('%@/threads/%@', this.namespaceUrl(), this.id);
-  return apiRequestPromise(this.inbox(), 'put', url,
-    {"add_tags" : addTags, "remove_tags" : removeTags },
-    function(value) {
-      self.reload();
-      return self;
-    });
+
+  return this.promise(function(resolve, reject) {
+    // modify the tags, then reload ourselves, then call the promises' success method
+    apiRequestPromise(self.inbox(), 'put', url, {
+        "add_tags" : addTags, "remove_tags" : removeTags 
+      }, function(value) {
+        self.reload().then(function(){
+          return resolve(self);
+        }, reject);
+    }, reject);
+  });
 }
 
 INThread.prototype.addTags = function(tags) {
@@ -92,7 +97,7 @@ INThread.prototype.removeTags = function(tags) {
 
 INThread.prototype.hasTag = function(tag) {
   for(i = 0; i < this.tagData.length; i++)
-    if(this.tagData[i].tagName == tag)
+    if ((this.tagData[i].tagName == tag) || (this.tagData[i].name == tag))
       return true;
   return false;
 };
