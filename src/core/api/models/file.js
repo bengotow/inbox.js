@@ -25,17 +25,25 @@ INFile.prototype.resourcePath = function() {
 };
 
 
-INFile.prototype.downloadUrl = function() {
-  if (!this.isUnsynced()) {
-    return urlFormat('%@/files/%@/download', this.namespaceId(), this.id);
-  }
-  return null;
+INFile.prototype.download = function() {
+  var inbox = this.namespace().inbox();
+  var url = urlFormat('%@/files/%@/download', this.namespaceUrl(), this.id);
+
+  var filename = this.filename || this.id;
+  var content_type = this.content_type || "text/plain;charset=utf-8";
+  apiRequestData(inbox, 'get', url, function(err, response) {
+    if (err) console.log('error getting');
+    else {
+      var blob = new Blob([response], {type: content_type});
+      saveAs(blob, filename);
+    }
+  });
 };
 
 
 defineResourceMapping(INFile, {
   'filename': 'filename',
-  'mimetype': 'mimetype',
+  'content_type': 'content_type',
   'size': 'int:size',
   'messageID': 'message',
   'isEmbedded': 'bool:is_embedded',
