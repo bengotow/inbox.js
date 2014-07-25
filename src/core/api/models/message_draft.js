@@ -93,11 +93,11 @@ INDraft.prototype.send = function() {
 	var url = urlFormat('%@/send', this.namespaceUrl());
 
 	if (this.isUnsynced()) {
-    // Just send a message
-    data = this.raw();
-    delete data.id;
-    delete data.object;
-    data = toJSON(data);
+		// Just send a message
+		data = this.raw();
+		delete data.id;
+		delete data.object;
+		data = toJSON(data);
 	} else {
 		// Send using the saved ID
 		data = toJSON({
@@ -133,5 +133,6 @@ INDraft.prototype.dispose = function() {
 
 defineResourceMapping(INDraft, {
 	'thread': 'reply_to_thread',
-  'object': 'const:draft'
+	'state': 'state',
+	'object': 'const:draft'
 }, INMessage);
