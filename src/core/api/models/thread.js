@@ -90,6 +90,13 @@ INThread.prototype.removeTags = function(tags) {
   return this.updateTags([], tags);
 };
 
+INThread.prototype.hasTag = function(tag) {
+  for(i = 0; i < this.tagData.length; i++)
+    if(this.tagData[i].tagName == tag)
+      return true;
+  return false;
+};
+
 INThread.prototype.messages = function(optionalMessagesOrFilters, filters) {
   return getter.call(this, INMessage, 'messages', optionalMessagesOrFilters, filters);
 };
