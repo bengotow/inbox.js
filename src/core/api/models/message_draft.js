@@ -73,8 +73,18 @@ INDraft.prototype.save = function() {
 	var pattern = this.isUnsynced() ? '%@/drafts' : '%@/drafts/%@';
 	var url = urlFormat(pattern, this.namespaceUrl(), this.id);
 	var inbox = this.inbox();
+
+    // Flatten the attachments for lowering to json, then restore
+    var attachments = this.attachments;
+    var attachmentIDs = [];
+    for(i = 0; i < attachments.length; i++) {
+      attachmentIDs.push(this.attachments[i].id);
+    }
+    this.attachments = attachmentIDs;
 	var self = this;
 	var rawJson = this.toJSON();
+    this.attachments = attachments;
+
 	return this.promise(function(resolve, reject) {
 		apiRequest(inbox, 'post', url, rawJson, function(err, response) {
 			if (err) return reject(err);
