@@ -13,6 +13,7 @@ function INDraft(inbox, id, namespaceId) {
   }
   INMessage.call(this, inbox, id, namespaceId);
   if (data) this.update(data);
+  this.attachments = []
 }
 
 inherits(INDraft, INMessage);
@@ -33,7 +34,7 @@ INDraft.prototype.addRecipients = function(participants) {
 
 INDraft.prototype.uploadAttachment = function(fileNameOrFile, blobForFileName) {
   var namespace = this.namespace();
-	var self = this;
+  var self = this;
   return this.promise(function(resolve, reject) {
     uploadFile(self, fileNameOrFile, blobForFileName, function(err, response) {
       if (err) {
@@ -42,7 +43,7 @@ INDraft.prototype.uploadAttachment = function(fileNameOrFile, blobForFileName) {
         }
         return reject(err);
       }
-			self.attachmentIDs.push(response.id);
+      self.attachments.push(response);
       return resolve(response);
     });
   });
@@ -55,11 +56,11 @@ INDraft.prototype.removeAttachment = function(file) {
 	}
 	var id = typeof file === 'string' ? file : file.id;
 	var i;
-	var ii = this.attachmentIDs.length;
+	var ii = this.attachments.length;
 
 	for (i=0; i<ii; ++i) {
-		if (this.attachmentIDs[i] === id) {
-			this.attachmentIDs.splice(i, 1);
+		if (this.attachments[i].id === id) {
+			this.attachments.splice(i, 1);
 			break;
 		}
 	}

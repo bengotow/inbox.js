@@ -77,9 +77,9 @@ INThread.prototype.updateTags = function(addTags, removeTags) {
 
   return this.promise(function(resolve, reject) {
     // modify the tags, then reload ourselves, then call the promises' success method
-    apiRequestPromise(self.inbox(), 'put', url, {
+    apiRequestPromise(self.inbox(), 'put', url, JSON.stringify({
         "add_tags" : addTags, "remove_tags" : removeTags 
-      }, function(value) {
+      }), function(value) {
         self.reload().then(function(){
           return resolve(self);
         }, reject);

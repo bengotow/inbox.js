@@ -61,9 +61,9 @@ INMessage.prototype.attachment = function(indexOrId) {
     index = indexOrId >>> 0;
   } else if (typeof indexOrId === 'string') {
     var i;
-    var ii = this.attachmentIDs.length;
+    var ii = this.attachments.length;
     for (i=0; i<ii; ++i) {
-      if (indexOrId === this.attachmentIDs[i]) {
+      if (indexOrId === this.attachments[i].id) {
         index = i;
         break;
       }
@@ -77,13 +77,13 @@ INMessage.prototype.attachment = function(indexOrId) {
     return null;
   }
 
-  var element = this.attachmentIDs[index];
+  var attachment = this.attachments[index];
 
-  if (typeof element === 'undefined') {
+  if (typeof attachment === 'undefined') {
     return null;
   }
 
-  return new INFile(this.inbox(), element, this.namespaceId());
+  return attachment;
 };
 
 INMessage.prototype.markAsRead = function() {
@@ -112,6 +112,6 @@ defineResourceMapping(INMessage, {
   'cc': 'array:cc',
   'bcc': 'array:bcc',
   'unread': 'bool:unread',
-  'attachmentIDs': 'array:files',
+  'attachments': 'array:files',
   'object': 'const:message'
 });

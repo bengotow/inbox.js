@@ -71,11 +71,13 @@ function uploadFile(namespace, fileOrFileName, fileDataOrCallback, callback) {
   apiRequest(inbox, 'post', url, data, function(err, response) {
     if (err) return callback(err, null);
 
-    callback(null, makeFile(response));
+    for(i = 0; i < response.length; i++)
+      callback(null, makeFile(response[i]));
 
     function makeFile(item) {
       item = new INFile(namespace, item);
-      persistModel(item);
+      //TODO: enable this when it works. -cg3
+      //persistModel(item);
       return item;
     }
   });

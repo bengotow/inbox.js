@@ -68,8 +68,6 @@ function apiRequest(inbox, method, url, data, callback) {
     data = null;
   } else if (typeof data !== 'string' && typeof data !== 'object') {
     data = null;
-  } else if(typeof data === 'object') {
-    data = JSON.stringify(data);
   }
 
   if (typeof callback !== 'function') {
