@@ -39,7 +39,7 @@ INMessage.prototype.reply = function() {
 };
 
 
-INMessage.prototype.attachments = function() {
+INMessage.prototype.attachmentsPromise = function() {
   var self = this;
   var filters = {};
   return this.promise(function(resolve, reject) {
