@@ -71,6 +71,7 @@ function uploadFile(namespace, fileOrFileName, fileDataOrCallback, callback) {
   apiRequest(inbox, 'post', url, data, function(err, response) {
     if (err) return callback(err, null);
 
+    var i = 0;
     for(i = 0; i < response.length; i++)
       callback(null, makeFile(response[i]));
 
