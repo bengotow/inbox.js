@@ -14,6 +14,7 @@ function INDraft(inbox, id, namespaceId) {
   INMessage.call(this, inbox, id, namespaceId);
   if (data) this.update(data);
   this.attachments = []
+  this.attachmentIDs = []
 }
 
 inherits(INDraft, INMessage);
@@ -44,6 +45,7 @@ INDraft.prototype.uploadAttachment = function(fileNameOrFile, blobForFileName) {
         return reject(err);
       }
       self.attachments.push(response);
+      self.attachmentIDs.push(response.id);
       return resolve(response);
     });
   });
@@ -64,6 +66,13 @@ INDraft.prototype.removeAttachment = function(file) {
 			break;
 		}
 	}
+	for (i=0; i<ii; ++i) {
+		if (this.attachmentIDs[i] == id) {
+			this.attachmentIDs.splice(i, 1);
+			break;
+		}
+	}
+
 	return this;
 };
 
@@ -74,23 +83,15 @@ INDraft.prototype.save = function() {
 	var url = urlFormat(pattern, this.namespaceUrl(), this.id);
 	var inbox = this.inbox();
 
-    // Flatten the attachments for lowering to json, then restore
-    var attachments = this.attachments;
-    var attachmentIDs = [];
-    for(i = 0; i < attachments.length; i++) {
-      attachmentIDs.push(this.attachments[i].id);
-    }
-    this.attachments = attachmentIDs;
 	var self = this;
-	var rawJson = this.toJSON();
-    this.attachments = attachments;
-
+	var data = this.raw();
+	data.files = this.attachmentIDs;
+	var rawJson = toJSON(data);
 	return this.promise(function(resolve, reject) {
 		apiRequest(inbox, 'post', url, rawJson, function(err, response) {
 			if (err) return reject(err);
 			// Should delete the old cached version, if any
 			deleteModel(self);
-
 			self.update(response);
 			persistModel(self);
 			resolve(self);
@@ -108,6 +109,7 @@ INDraft.prototype.send = function() {
 		data = this.raw();
 		delete data.id;
 		delete data.object;
+		data.files = this.attachmentIDs;
 		data = toJSON(data);
 	} else {
 		// Send using the saved ID
