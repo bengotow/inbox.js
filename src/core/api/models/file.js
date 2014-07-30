@@ -25,17 +25,17 @@ INFile.prototype.resourcePath = function() {
 };
 
 
-INFile.prototype.download = function() {
+INFile.prototype.download = function(saveCallback) {
   var inbox = this.namespace().inbox();
   var url = urlFormat('%@/files/%@/download', this.namespaceUrl(), this.id);
 
   var filename = this.filename || this.id;
   var content_type = this.content_type || "text/plain;charset=utf-8";
   apiRequestData(inbox, 'get', url, function(err, response) {
-    if (err) console.log('error getting');
+    if (err) console.log('error downloading file');
     else {
       var blob = new Blob([response], {type: content_type});
-      saveAs(blob, filename);
+      saveCallback(blob, filename);
     }
   });
 };
