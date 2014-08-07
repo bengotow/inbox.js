@@ -81,7 +81,9 @@ function uploadFile(namespace, fileOrFileName, fileDataOrCallback, callback) {
 
     var i = 0;
     for(i = 0; i < response.length; i++)
+    {
       callback(null, makeFile(response[i]));
+    }
 
     function makeFile(item) {
       item = new INFile(namespace, item);
